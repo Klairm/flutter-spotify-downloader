@@ -11,7 +11,23 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 var yt = YoutubeExplode();
 var video_Id;
 var _controller = TextEditingController();
+
 Directory dir = Directory("/storage/emulated/0/Download/music/");
+
+List<String> tracks = <String>[];
+
+final credentials =
+    SpotifyApiCredentials('CLIENT_ID_HERE', 'CLIENT_SECRET_HERE');
+
+// Colors used
+Color spotifyColor = const Color.fromRGBO(30, 215, 96, 1);
+Color customBackgroundColor = const Color.fromRGBO(12, 12, 12, 1);
+Color textColor = Colors.white;
+
+const String regex =
+    r'[^\p{Alphabetic}\p{Mark}\p{Decimal_Number}\p{Connector_Punctuation}\p{Join_Control}\s]+';
+
+// TODO: Clean code
 void main() => runApp(const MaterialApp(
       home: Body(),
     ));
@@ -24,16 +40,6 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  List<String> tracks = <String>[];
-  final credentials =
-      SpotifyApiCredentials('CLIENT_ID_HERE', 'CLIENT_SECRET_HERE');
-
-  Color spotifyColor = const Color.fromRGBO(30, 215, 96, 1);
-  Color customBackgroundColor = const Color.fromRGBO(12, 12, 12, 1);
-  Color textColor = Colors.white;
-  final String regex =
-      r'[^\p{Alphabetic}\p{Mark}\p{Decimal_Number}\p{Connector_Punctuation}\p{Join_Control}\s]+';
-
   Future<void> download(String song) async {
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
@@ -226,6 +232,7 @@ class _BodyState extends State<Body> {
                   Expanded(
                       flex: 1,
                       child: ListView.builder(
+                          // FIXME: Make the list scroll less laggy
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           itemCount: tracks.length,
