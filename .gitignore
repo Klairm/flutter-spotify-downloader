@@ -5,6 +5,7 @@
 *.swp
 *.lock
 .metadata
+
 .DS_Store
 .atom/
 .buildlog/
@@ -30,7 +31,7 @@ web/
 analysis_options.yaml
 
 
-.* 
+ 
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
