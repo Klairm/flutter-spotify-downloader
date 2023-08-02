@@ -25,7 +25,7 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
 
   Directory dir = Directory("/storage/emulated/0/Download/music/");
 
-  List<String> tracks = <String>[];
+  Map<String, String> tracks = {};
 
   String regex =
       r'[^\p{Alphabetic}\p{Mark}\p{Decimal_Number}\p{Connector_Punctuation}\p{Join_Control}\s]+';
@@ -184,8 +184,11 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                               var song = track.name
                                   .toString()
                                   .replaceAll(RegExp(regex, unicode: true), '');
+
+                              var coverURL = track.album?.images?.first.url;
                               setState(() {
-                                tracks.add('$artist - $song');
+                                tracks.addAll(
+                                    {'$artist - $song': coverURL.toString()});
                                 if (kDebugMode) {
                                   print(
                                       '[DEBUG] Added $artist - $song to tracks list');
@@ -210,7 +213,7 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                               backgroundColor: Colors.transparent,
                             ),
                             onPressed: () async {
-                              Future.forEach(tracks, (element) async {
+                              tracks.keys.forEach((element) async {
                                 await download(element.toString());
                               });
                             },
@@ -238,10 +241,11 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                           return InkWell(
                             onTap: () async {
                               if (kDebugMode) {
-                                print('[DEBUG] Clicked: ${tracks[index]}');
+                                print(
+                                    '[DEBUG] Clicked: ${tracks.keys.elementAt(index)}');
                               }
 
-                              await download(tracks[index]);
+                              await download(tracks.keys.elementAt(index));
                             },
                             child: SizedBox(
                               height: boxSize - 100,
@@ -252,14 +256,14 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                                   SizedBox(
                                     height: 70,
                                     width: 70,
-                                    child: Image.asset(
-                                      "assets/images/cover.jpg",
+                                    child: Image.network(
+                                      tracks.values.elementAt(index),
                                     ),
                                   ),
                                   Expanded(
                                     child: ListTile(
                                       title: Text(
-                                        tracks[index],
+                                        tracks.keys.elementAt(index),
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(fontSize: 17),
                                       ),
@@ -281,7 +285,8 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                                                   '[DEBUG] Clicked: ${tracks[index]}');
                                             }
 
-                                            await download(tracks[index]);
+                                            await download(
+                                                tracks.keys.elementAt(index));
                                           },
                                           icon: const Icon(
                                             Icons.file_download_outlined,
