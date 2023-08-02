@@ -4,10 +4,11 @@ import 'package:path/path.dart' as path;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sample_app/utils/constants.dart';
+import 'package:spotify_downloader/utils/constants.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:spotify/spotify.dart' as sp;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
 class SpotifyDownloader extends StatefulWidget {
   const SpotifyDownloader({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class SpotifyDownloader extends StatefulWidget {
 
 class _SpotifyDownloaderState extends State<SpotifyDownloader> {
   var yt = YoutubeExplode();
+  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   var videoId;
   var _controller = TextEditingController();
 
@@ -52,7 +54,8 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
 
     var audioStream = yt.videos.streamsClient.get(audio);
 
-    var filePath = path.join(dir.uri.toFilePath(), '$song.mp3');
+    var filePath =
+        path.join(dir.uri.toFilePath(), '$song.${audio.container.name}');
 
     var file = File(filePath);
     if (await file.exists()) {
@@ -78,6 +81,27 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
       output.add(data);
     }
     await output.close();
+
+    // Convert to MP3
+
+    var arguments = [];
+    print(filePath);
+    if (filePath.endsWith('.mp4')) {
+      arguments = ["-i", filePath, filePath.replaceAll('.mp4', '.mp3')];
+    } else if (filePath.endsWith('.webm')) {
+      arguments = ["-i", filePath, filePath.replaceAll('.webm', '.mp3')];
+    } else {
+      print('Unknown format to convert.');
+      return;
+    }
+    await _flutterFFmpeg
+        .executeWithArguments(arguments)
+        .then((rc) => print("FFmpeg process exited with rc $rc"));
+
+    //delete webm file
+    if (filePath.endsWith('.webm') || filePath.endsWith('.mp4')) {
+      file.delete();
+    }
     if (kDebugMode) {
       print("[DEBUG] $song Download Completed.");
     }
@@ -161,7 +185,7 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                                   .toString()
                                   .replaceAll(RegExp(regex, unicode: true), '');
                               setState(() {
-                                tracks.add('$artist - $song ');
+                                tracks.add('$artist - $song');
                                 if (kDebugMode) {
                                   print(
                                       '[DEBUG] Added $artist - $song to tracks list');

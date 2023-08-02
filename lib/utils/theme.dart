@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sample_app/utils/constants.dart';
+import 'package:spotify_downloader/utils/constants.dart';
 
 class AppTheme {
   AppTheme._();
