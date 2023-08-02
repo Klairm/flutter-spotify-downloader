@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.sample_app">
+    package="com.example.spotify_downloader">
    <application
         android:label="Spotify Downloader"
         android:name="${applicationName}"

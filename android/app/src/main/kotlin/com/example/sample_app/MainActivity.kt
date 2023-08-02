@@ -1,4 +1,4 @@
-package com.example.sample_app
+package com.example.spotify_downloader
 
 import io.flutter.embedding.android.FlutterActivity
 
