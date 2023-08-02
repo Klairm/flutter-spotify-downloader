@@ -1,6 +1,6 @@
-import 'package:sample_app/home.dart';
+import 'package:spotify_downloader/home.dart';
 import 'package:flutter/material.dart';
-import 'package:sample_app/utils/theme.dart';
+import 'package:spotify_downloader/utils/theme.dart';
 
 void main() {
   runApp(App());
