@@ -42,7 +42,10 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
       progressValueColor: spotifyColor,
     );
 
-    await yt.search.getVideos(song).then((value) => videoId = value.first.id);
+    await yt
+        .search(song)
+        .then((value) => videoId = value.first.id)
+        .catchError((onError) => print((onError)));
     await yt.videos.get(videoId);
     if (kDebugMode) {
       print("[DEBUG] Song name: $song");
@@ -58,11 +61,15 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
         path.join(dir.uri.toFilePath(), '$song.${audio.container.name}');
 
     var file = File(filePath);
+    var completedFile = File(path.join(dir.uri.toFilePath(), '$song.mp3'));
     if (await file.exists()) {
       if (kDebugMode) {
         print("[DEBUG] $filePath exists...");
       }
       await file.delete();
+    }
+    if (await completedFile.exists()) {
+      await completedFile.delete();
     }
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
 
@@ -105,6 +112,7 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
     if (kDebugMode) {
       print("[DEBUG] $song Download Completed.");
     }
+
     pd.close();
   }
 
@@ -143,7 +151,6 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                             // Take the ID from the URL
                             if (text.contains("playlist/")) {
                               final playlistID =
-                                  // ignore: unnecessary_string_escapes
                                   RegExp("playlist\/([a-zA-Z0-9]{22})");
                               if (playlistID.hasMatch(text)) {
                                 var match = playlistID
@@ -213,7 +220,8 @@ class _SpotifyDownloaderState extends State<SpotifyDownloader> {
                               backgroundColor: Colors.transparent,
                             ),
                             onPressed: () async {
-                              tracks.keys.forEach((element) async {
+                              await Future.forEach(tracks.keys.toList(),
+                                  (element) async {
                                 await download(element.toString());
                               });
                             },
